@@ -15,12 +15,41 @@ export const useGetNotes = () => {
   return query;
 };
 
+export const useGetNotesById = (id: string) => {
+  const query = useQuery({
+    queryKey: ['notes', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/get/${id}`);
+      return data;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled: !!id,
+  });
+
+  return query;
+};
+
 export const useAddNote = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (newNote) => {
       const { data } = await api.post('/create', newNote);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+  });
+};
+
+export const useDeleteNote = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await api.delete(`/delete/${id}`);
       return data;
     },
     onSuccess: () => {

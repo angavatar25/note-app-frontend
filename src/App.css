@@ -1,9 +1,27 @@
 @import "tailwindcss";
 
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
 .parent {
-  @apply bg-gray-500 w-full min-h-screen;
+  @apply bg-gray-200 w-full min-h-screen;
 }
 
 .container {
-  @apply max-w-[500px] mx-auto bg-white rounded-2xl;
+  @apply max-w-[500px] max-h-[800px] m-auto bg-white rounded-2xl;
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar { 
+    display: none;  /* Older Safari and Chromium */
 }

@@ -4,15 +4,18 @@ interface NoteCardProps {
   title: string;
   bodyText: string;
   noteColor: string;
+  onClick: () => void;
 }
 
 const NoteCard: React.FC<NoteCardProps> = ({
   title,
   bodyText,
   noteColor,
+  onClick,
 }) => {
   return (
-    <div 
+    <div
+      onClick={onClick}
       className="rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer max-w-2xl"
       style={{ backgroundColor: noteColor || '#ffffff' }}
     >
