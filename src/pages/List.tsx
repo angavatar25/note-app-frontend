@@ -71,6 +71,7 @@ const List = () => {
                 title={note.title}
                 bodyText={note.bodyText}
                 noteColor={note.notecolor}
+                label={note.labelname}
                 onClick={() => handleGetNoteById(note.id)}
               />
             ))}

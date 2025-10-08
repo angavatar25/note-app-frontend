@@ -1,6 +1,8 @@
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ButtonBase from "./ButtonBase";
+import DropdownLabel from "./Label";
+import { useGetLabels } from "../hooks/useNotes";
 
 interface NoteModalProps {
   isOpen: boolean;
@@ -11,7 +13,7 @@ interface NoteModalProps {
   onSave: (note: { title: string; bodyText: string; notecolor: string }) => void;
 }
 
-const colors = ["#F87171", "#FBBF24", "#34D399", "#60A5FA", "#A78BFA", "#F9F9F9"];
+const colors = ["#F87171", "#FBBF24", "#34D399", "#60A5FA", "#A78BFA"];
 
 const NoteModal: React.FC<NoteModalProps> = ({
   data,
@@ -23,11 +25,22 @@ const NoteModal: React.FC<NoteModalProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [bodyText, setBodyText] = useState("");
+  const [labelName, setLabelName] = useState("Work");
   const [notecolor, setNotecolor] = useState(colors[0]);
+
+  const { data: labels } = useGetLabels();
 
   const handleSubmit = () => {
     if (!title.trim() || !bodyText.trim()) return;
-    onSave({ title, bodyText, notecolor });
+
+    const payload = {
+      title,
+      bodyText,
+      notecolor,
+      labelname: labelName,
+    };
+
+    onSave(payload);
     handleEmpty();
   };
 
@@ -86,23 +99,38 @@ const NoteModal: React.FC<NoteModalProps> = ({
             </div>
 
             {/* Color Picker */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-600 mb-2">
-                Pick Note Color
-              </label>
-              <div className="flex gap-3">
-                {colors.map((c) => (
-                  <button
-                    key={c}
-                    className={`w-8 h-8 rounded-full border-2 transition ${
-                      notecolor === c
-                        ? "border-gray-800 scale-110"
-                        : "border-transparent hover:scale-105"
-                    }`}
-                    style={{ backgroundColor: c }}
-                    onClick={() => setNotecolor(c)}
+            <div className="mb-6 mt-4 flex justify-between">
+              <div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Label
+                  </label>
+                  <DropdownLabel
+                    label="Task"
+                    options={labels || []}
+                    selected={labelName}
+                    onSelect={setLabelName}
                   />
-                ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-2">
+                  Pick Note Color
+                </label>
+                <div className="flex gap-3">
+                  {colors.map((c) => (
+                    <button
+                      key={c}
+                      className={`w-6 h-6 rounded-full border-2 transition ${
+                        notecolor === c
+                          ? "border-gray-800 scale-110"
+                          : "border-transparent hover:scale-105"
+                      }`}
+                      style={{ backgroundColor: c }}
+                      onClick={() => setNotecolor(c)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 

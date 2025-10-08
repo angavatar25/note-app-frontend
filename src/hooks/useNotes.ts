@@ -57,3 +57,17 @@ export const useDeleteNote = () => {
     },
   });
 };
+
+export const useGetLabels = () => {
+  const query = useQuery({
+    queryKey: ['labels'],
+    queryFn: async () => {
+      const { data } = await api.get('/labels');
+      return data;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  return query;
+};
