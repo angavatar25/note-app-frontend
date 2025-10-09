@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import ButtonBase from "./ButtonBase";
 import DropdownLabel from "./Label";
 import { useGetLabels } from "../hooks/useNotes";
+import useTheme from "../hooks/useTheme";
+import classNames from "classnames";
 
 interface NoteModalProps {
   isOpen: boolean;
@@ -28,6 +30,8 @@ const NoteModal: React.FC<NoteModalProps> = ({
   const [labelName, setLabelName] = useState("Work");
   const [notecolor, setNotecolor] = useState(colors[0]);
 
+  const { isDarkMode } = useTheme();
+
   const { data: labels } = useGetLabels();
 
   const handleSubmit = () => {
@@ -51,6 +55,11 @@ const NoteModal: React.FC<NoteModalProps> = ({
     onClose();
   }
 
+  const handleDelete = () => {
+    onDelete();
+    handleEmpty();
+  }
+
   useEffect(() => {
     if (data) {
       setTitle(data.title);
@@ -63,9 +72,9 @@ const NoteModal: React.FC<NoteModalProps> = ({
     <>    
       {isOpen ? (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
+          <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-lg p-6 w-full max-w-lg mx-4`}>
             <div className="flex justify-between">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 Create a New Note
               </h2>
               <X onClick={handleEmpty} className="cursor-pointer" />
@@ -110,6 +119,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
                     options={labels || []}
                     selected={labelName}
                     onSelect={setLabelName}
+                    isDarkMode={isDarkMode}
                   />
                 </div>
               </div>
@@ -121,11 +131,12 @@ const NoteModal: React.FC<NoteModalProps> = ({
                   {colors.map((c) => (
                     <button
                       key={c}
-                      className={`w-6 h-6 rounded-full border-2 transition ${
-                        notecolor === c
-                          ? "border-gray-800 scale-110"
-                          : "border-transparent hover:scale-105"
-                      }`}
+                      className={classNames({
+                        'w-6 h-6 rounded-full border-2 transition': true,
+                        'border-gray-800 scale-110': notecolor === c && !isDarkMode,
+                        'border-transparent hover:scale-105': notecolor !== c,
+                        'border-gray-300 scale-110': notecolor === c && isDarkMode,
+                      })}
                       style={{ backgroundColor: c }}
                       onClick={() => setNotecolor(c)}
                     />
@@ -137,7 +148,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
             {/* Buttons */}
             <div className="flex justify-end gap-3">
               <ButtonBase
-                onAction={!isCreateNew ? onDelete : handleEmpty}
+                onAction={!isCreateNew ? handleDelete : handleEmpty}
                 label={!isCreateNew ? "Delete" : "Cancel"}
                 type={!isCreateNew ? "secondary" : "transparent"}
               />
