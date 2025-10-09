@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Moon, Sun, LogOut, ChevronRight } from 'lucide-react';
 import { Logout } from '../api/auth';
+import useNavigation from '../hooks/useNavigate';
+import { useGetUserData } from '../hooks/useUser';
+import useTheme from '../hooks/useTheme';
 
 const Settings: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
 
-  const user = {
-    name: 'Ahmed Hassan',
-    email: 'ahmed@gmail.com',
-  };
+  const { redirectTo } = useNavigation();
 
-  const handleToggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  const { data, isLoading } = useGetUserData();
 
   const handleLogout = () => {
     Logout();
@@ -20,15 +18,14 @@ const Settings: React.FC = () => {
   };
 
   const handleBack = () => {
-    console.log('Back clicked');
+    redirectTo('/');
   };
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}  items-center justify-center flex flex-col h-screen`}>
       <div className="w-full max-w-[500px] max-h-[800px] m-auto relative">
         {/* iPhone-like frame */}
-        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl overflow-hidden min-h-[800px] relative`}>
-
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl overflow-hidden min-h-[800px] relative`}>
           {/* Header */}
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-6 pt-4 pb-6`}>
             <button 
@@ -44,17 +41,39 @@ const Settings: React.FC = () => {
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-6 py-6`}>
             <div className="flex items-center gap-4">
               {/* Avatar */}
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                {user.name.split(' ').map(n => n[0]).join('')}
-              </div>
+              {isLoading ? (
+                <div className="w-16 h-16 bg-gray-300 rounded-full animate-pulse"></div>
+              ) : (
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  {data?.userData.name.split(' ').map(n => n[0]).join('')}
+                </div>
+              )}
               {/* User Info */}
               <div className="flex-1">
-                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {user.name}
-                </h2>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {user.email}
-                </p>
+                {isLoading ? (
+                  <>
+                    <div className="mb-2 overflow-hidden">
+                      <div className={`h-6 w-40 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-md relative overflow-hidden`}>
+                        <div className={`absolute inset-0 ${isDarkMode ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700' : 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200'} animate-shimmer`}></div>
+                      </div>
+                    </div>
+                    {/* Skeleton for Email */}
+                    <div className="overflow-hidden">
+                      <div className={`h-4 w-32 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-md relative overflow-hidden`}>
+                        <div className={`absolute inset-0 ${isDarkMode ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700' : 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200'} animate-shimmer`}></div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {data?.userData.name}
+                    </h2>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {data?.userData.email}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -66,7 +85,7 @@ const Settings: React.FC = () => {
           {/* Settings Menu */}
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-6 pb-24`}>
             <button
-              onClick={handleToggleTheme}
+              onClick={toggleTheme}
               className={`w-full flex items-center justify-between py-4 px-4 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} rounded-xl transition-colors group`}
             >
               <div className="flex items-center gap-4">

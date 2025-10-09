@@ -13,11 +13,11 @@
 }
 
 .parent {
-  @apply bg-gray-200 w-full min-h-screen;
+  @apply w-full min-h-screen;
 }
 
 .container {
-  @apply max-w-[500px] max-h-[800px] m-auto bg-white rounded-2xl;
+  @apply max-w-[500px] max-h-[800px] m-auto rounded-2xl;
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
   scrollbar-width: none;
 }
