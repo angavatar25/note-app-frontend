@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useLogin, useRegister } from '../hooks/useAuth';
+import Toast from '../components/Toast';
+import classNames from 'classnames';
 
 // Types
 interface LoginForm {
@@ -22,6 +24,20 @@ const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [toast, setToast] = useState({
+    show: false,
+    message: '',
+    type: 'success' as 'success' | 'error',
+  });
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ show: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast({ ...toast, show: false });
+  };
+
   const [loginForm, setLoginForm] = useState<LoginForm>({
     email: '',
     passwords: '',
@@ -33,6 +49,10 @@ const AuthPage: React.FC = () => {
     email: '',
     passwords: '',
   });
+
+  const isFormValid = (form: LoginForm | SignupForm) => {
+    return Object.values(form).every(value => value.trim() !== '');
+  };
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -47,7 +67,14 @@ const AuthPage: React.FC = () => {
 
     const { email, passwords } = loginForm;
 
-    login.mutate({ email, passwords })
+    login.mutate(
+      { email, passwords },
+      {
+        onError: (error) => {
+          showToast(error.message, 'error');
+        }
+      }
+    )
   };
 
   const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,13 +88,33 @@ const AuthPage: React.FC = () => {
   const handleSignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isFormValid(signupForm)) return;
+
     const { fullName, email, passwords } = signupForm;
 
-    register.mutate({ name: fullName, email, passwords });  
+    register.mutate(
+      { name: fullName, email, passwords },
+      {
+        onSuccess: () => {
+          showToast('Registration successful! Please log in.', 'success');
+          setIsLogin(true);
+          setSignupForm({ fullName: '', email: '', passwords: '' });
+        },
+        onError: (error) => {
+          showToast(error.message, 'error');
+        }
+      }
+    );
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={hideToast}
+      />
       <div className="w-full max-w-md">
         {/* Auth Card */}
         <div className="bg-white rounded-3xl shadow-xl p-8">
@@ -123,30 +170,13 @@ const AuthPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={loginForm.rememberMe}
-                    onChange={handleLoginChange}
-                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-600">Remember me</span>
-                </label>
-                <button
-                  type="button"
-                  className="text-sm text-gray-600 hover:text-blue-500 transition-colors"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30"
+                className={classNames({
+                  'w-full py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30': true,
+                  'opacity-50 cursor-not-allowed': !isFormValid(loginForm),
+                })}
               >
                 Sign In
               </button>
@@ -212,7 +242,10 @@ const AuthPage: React.FC = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30 mt-6"
+                className={classNames({
+                  'w-full py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30 mt-6': true,
+                  'opacity-50 cursor-not-allowed': !isFormValid(signupForm),
+                })}
               >
                 Sign Up
               </button>
