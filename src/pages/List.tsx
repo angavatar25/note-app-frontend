@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NoteCard from "../components/NoteCard";
 import NoteModal from "../components/NoteModal";
-import { useAddNote, useDeleteNote, useGetNotes, useGetNotesById, useUpdateNote } from "../hooks/useNotes";
-import { Settings } from "lucide-react";
+import { useAddNote, useDeleteNote, useGetLabels, useGetNotes, useGetNotesById, useGetNotesByLabel, useUpdateNote } from "../hooks/useNotes";
+import { Settings, Trash } from "lucide-react";
 import useNavigation from "../hooks/useNavigate";
 import useTheme from "../hooks/useTheme";
+import DropdownFilter from "../components/DropdownFilter";
 
 const List = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +13,9 @@ const List = () => {
   const [editNote, setEditNote] = useState(false);
 
   const [selectedNoteId, setSelectedNoteId] = useState<string>("");
+  const [selectedNoteFilter, setSelectedNoteFilter] = useState<string>("All");
+
+  const [labelFilter, setLabelFilter] = useState([]);
 
   const { redirectTo } = useNavigation();
 
@@ -19,6 +23,8 @@ const List = () => {
 
   const { data: notes } = useGetNotes();
   const { data: selectedNote } = useGetNotesById(selectedNoteId ?? "");
+  const { data: filteredNotes } = useGetNotesByLabel(selectedNoteFilter);
+  const { data: labels } = useGetLabels();
   
   const addNote = useAddNote();
   const deleteNote = useDeleteNote();
@@ -64,6 +70,23 @@ const List = () => {
     setEditNote(false);
   }
 
+  useEffect(() => {
+    if (labels && labels.length > 0) {
+      setLabelFilter(labels);
+
+      const allOption = { id: 'all', labelname: 'All' };
+      setLabelFilter((prev) => [allOption, ...prev]);
+
+      if (selectedNoteFilter === 'All' && !labels.find(label => label.labelname === 'All')) {
+        setSelectedNoteFilter('All');
+      }
+
+      if (!selectedNoteFilter) {
+        setSelectedNoteFilter('All');
+      }
+    }
+  }, [labels]);
+
   return (
     <>
       <NoteModal
@@ -95,14 +118,40 @@ const List = () => {
             </button>
           </div>
           <div className='p-6 no-scrollbar overflow-y-auto flex-1 space-y-3'>
-            {notes && notes.length > 0 && notes.map((note) => (
+          <div>
+            <DropdownFilter
+              label="Label"
+              options={labelFilter || []}
+              selected={selectedNoteFilter}
+              onSelect={setSelectedNoteFilter}
+              isDarkMode={isDarkMode}
+            />
+          </div>
+            {(!notes?.length || !filteredNotes?.length) && (
+              <div className="flex flex-col items-center justify-center mt-20 gap-2">
+                <Trash size={64} className="text-gray-400" />
+                <p className="text-gray-400">No notes</p>
+              </div>
+            )}
+            {selectedNoteFilter && filteredNotes && filteredNotes.length > 0 && filteredNotes.map((note) => (
               <NoteCard
                 key={note.id}
                 title={note.title}
                 bodyText={note.bodyText}
                 noteColor={note.notecolor}
                 label={note.labelname}
-
+                updatedTime={note.createdAt}
+                onClick={() => handleGetNoteById(note.id)}
+              />
+            ))}
+            {!selectedNoteFilter && notes && notes.length > 0 && notes.map((note) => (
+              <NoteCard
+                key={note.id}
+                title={note.title}
+                bodyText={note.bodyText}
+                noteColor={note.notecolor}
+                label={note.labelname}
+                updatedTime={note.createdAt}
                 onClick={() => handleGetNoteById(note.id)}
               />
             ))}

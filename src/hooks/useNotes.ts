@@ -94,3 +94,19 @@ export const useGetLabels = () => {
 
   return query;
 };
+
+export const useGetNotesByLabel = (label: string) => {
+  const query = useQuery({
+    queryKey: ['notes', { label }],
+    queryFn: async () => {
+      const url = label ? `/notes/lists?label=${label}` : '/notes/lists';
+      const { data } = await api.get(url);
+      return data;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled: !!label,
+  });
+
+  return query;
+}

@@ -25,7 +25,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative dropdown-filter">
       {/* Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
