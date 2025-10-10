@@ -75,7 +75,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
           <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-lg p-6 w-full max-w-lg mx-4`}>
             <div className="flex justify-between">
               <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                Create a New Note
+                {isCreateNew ? "Create a New Note" : "Edit Note"}
               </h2>
               <X onClick={handleEmpty} className="cursor-pointer" />
             </div>
