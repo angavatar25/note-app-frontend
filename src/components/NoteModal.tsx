@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ButtonBase from "./ButtonBase";
-import DropdownLabel from "./Label";
+import DropdownLabel from "./DropdownFilter";
 import { useGetLabels } from "../hooks/useNotes";
 import useTheme from "../hooks/useTheme";
 import classNames from "classnames";

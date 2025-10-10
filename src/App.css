@@ -10,6 +10,20 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  .line-2-clamp {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .line-1-clamp {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
 }
 
 .parent {
@@ -23,5 +37,14 @@
 }
 
 .container::-webkit-scrollbar { 
+    display: none;  /* Older Safari and Chromium */
+}
+
+.dropdown-filter {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+}
+
+.dropdown-filter::-webkit-scrollbar { 
     display: none;  /* Older Safari and Chromium */
 }
