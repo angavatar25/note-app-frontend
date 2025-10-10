@@ -8,7 +8,6 @@ import classNames from 'classnames';
 interface LoginForm {
   email: string;
   passwords: string;
-  rememberMe: boolean;
 }
 
 interface SignupForm {
@@ -41,7 +40,6 @@ const AuthPage: React.FC = () => {
   const [loginForm, setLoginForm] = useState<LoginForm>({
     email: '',
     passwords: '',
-    rememberMe: false,
   });
 
   const [signupForm, setSignupForm] = useState<SignupForm>({
@@ -55,10 +53,10 @@ const AuthPage: React.FC = () => {
   };
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setLoginForm(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -66,6 +64,8 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
 
     const { email, passwords } = loginForm;
+    
+    if (!isFormValid(loginForm)) return;
 
     login.mutate(
       { email, passwords },
